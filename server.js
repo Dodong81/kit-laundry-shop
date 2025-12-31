@@ -50,10 +50,10 @@ app.get('/', (req, res) => {
 
 app.post('/api/book-laundry', async (req, res) => {
     try {
-        const { name, phone, location, date, timeSlot } = req.body;
+        const { name, email, location, date, timeSlot } = req.body;
 
         // Validation
-        if (!name || !phone || !location || !date || !timeSlot) {
+        if (!name || !email || !location || !date || !timeSlot) {
             return res.status(400).json({ 
                 success: false, 
                 message: 'Missing required fields' 
@@ -64,7 +64,7 @@ app.post('/api/book-laundry', async (req, res) => {
         const booking = {
             id: Date.now(),
             name,
-            phone,
+            email,
             location,
             date,
             timeSlot,
@@ -100,18 +100,18 @@ app.post('/api/book-laundry', async (req, res) => {
 
                 await emailTransporter.sendMail({
                     from: process.env.EMAIL_USER,
-                    to: phone.includes('@') ? phone : `${name}@example.com`,
+                    to: email,
                     subject: `🧺 Kit Laundry Shop - Booking Confirmed (ID: ${booking.id})`,
                     html: emailContent
                 });
 
-                console.log('✉️ Confirmation email sent to:', phone);
+                console.log('✉️ Confirmation email sent to:', email);
             } catch (emailError) {
                 console.error('Email Error:', emailError.message);
                 // Continue even if email fails
             }
         } else {
-            console.log('📧 Email Demo - Would send to:', phone);
+            console.log('📧 Email Demo - Would send to:', email);
             console.log(`Details: Booking #${booking.id} confirmed for ${date} at ${timeSlot}`);
         }
 

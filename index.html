@@ -310,10 +310,10 @@
                     <input type="text" id="name" name="name" placeholder="John Doe" required>
                 </div>
 
-                <!-- Phone Number Field -->
+                <!-- Email Field -->
                 <div class="form-group">
-                    <label for="phone">📱 Phone Number (PH)</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+63 9XX XXX XXXX" required>
+                    <label for="email">📧 Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
                 </div>
 
                 <!-- Location Field -->
@@ -369,14 +369,14 @@
             e.preventDefault();
 
             const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
             const location = document.getElementById('location').value;
             const date = document.getElementById('date').value;
             const timeSlot = document.getElementById('timeSlot').value;
 
             // Validation
-            if (!name || !phone || !location || !date || !timeSlot) {
-                showError('Please fill in all fields and select a location and time.');
+            if (!name || !email || !location || !date || !timeSlot) {
+                showError('Please fill in all fields.');
                 return;
             }
 
@@ -393,7 +393,7 @@
                     },
                     body: JSON.stringify({
                         name,
-                        phone,
+                        email,
                         location,
                         date,
                         timeSlot
