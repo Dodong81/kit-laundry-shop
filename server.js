@@ -13,11 +13,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Email Configuration (Gmail)
+// Email Configuration (Gmail with port 465)
 let emailTransporter;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
     emailTransporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASSWORD
