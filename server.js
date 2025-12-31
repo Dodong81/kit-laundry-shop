@@ -115,29 +115,9 @@ app.post('/api/book-laundry', async (req, res) => {
             console.log(`Details: Booking #${booking.id} confirmed for ${date} at ${timeSlot}`);
         }
 
-        // Save booking
-        bookings.push(booking);
-
-        // Send SMS notification
-        if (client && accountSid !== 'your_account_sid') {
-            try {
-                await client.messages.create({
-                    body: `Hi ${name}! 🧺 Your laundry reservation at Kit Laundry Shop is confirmed!\n\nAddress: ${location}\nDate: ${date}\nTime: ${timeSlot}\n\nBooking ID: ${booking.id}\n\nThank you for choosing Kit Laundry Shop!`,
-                    from: fromPhoneNumber,
-                    to: phone
-                });
-            } catch (smsError) {
-                console.error('SMS Error:', smsError.message);
-                // Continue with response even if SMS fails
-            }
-        } else {
-            console.log('📧 SMS Demo - Would send to:', phone);
-            console.log(`Message: Hi ${name}! Your laundry reservation at Kit Laundry Shop is confirmed!\n\nAddress: ${location}\nDate: ${date}\nTime: ${timeSlot}`);
-        }
-
         res.status(200).json({
             success: true,
-            message: 'Booking confirmed! SMS notification sent.',
+            message: 'Booking confirmed! Confirmation email sent.',
             booking: booking
         });
 
