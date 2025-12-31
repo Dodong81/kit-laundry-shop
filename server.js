@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 const twilio = require('twilio');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,21 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+// Email Configuration (Gmail)
+let emailTransporter;
+if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+    emailTransporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+} else {
+    console.warn('Email credentials not configured. Emails will not be sent.');
+    emailTransporter = null;
+}
 
 // Twilio Configuration
 const accountSid = process.env.TWILIO_ACCOUNT_SID || 'your_account_sid';
@@ -55,6 +71,49 @@ app.post('/api/book-laundry', async (req, res) => {
             bookedAt: new Date(),
             status: 'confirmed'
         };
+
+        // Save booking
+        bookings.push(booking);
+
+        // Send Email Notification
+        if (emailTransporter) {
+            try {
+                const emailContent = `
+                    <h2>🧺 Kit Laundry Shop - Booking Confirmed!</h2>
+                    <p>Hi ${name},</p>
+                    <p>Your laundry reservation has been confirmed! Here are your booking details:</p>
+                    <hr>
+                    <p><strong>Booking Details:</strong></p>
+                    <ul>
+                        <li><strong>Booking ID:</strong> ${booking.id}</li>
+                        <li><strong>Location:</strong> ${location}</li>
+                        <li><strong>Date:</strong> ${date}</li>
+                        <li><strong>Time:</strong> ${timeSlot}</li>
+                        <li><strong>Booked At:</strong> ${booking.bookedAt.toLocaleString()}</li>
+                    </ul>
+                    <hr>
+                    <p>Thank you for choosing Kit Laundry Shop! We look forward to serving you.</p>
+                    <p><strong>If you have any questions, please contact us immediately.</strong></p>
+                    <br>
+                    <p>Best regards,<br><strong>Kit Laundry Shop Team</strong> 🧺</p>
+                `;
+
+                await emailTransporter.sendMail({
+                    from: process.env.EMAIL_USER,
+                    to: phone.includes('@') ? phone : `${name}@example.com`,
+                    subject: `🧺 Kit Laundry Shop - Booking Confirmed (ID: ${booking.id})`,
+                    html: emailContent
+                });
+
+                console.log('✉️ Confirmation email sent to:', phone);
+            } catch (emailError) {
+                console.error('Email Error:', emailError.message);
+                // Continue even if email fails
+            }
+        } else {
+            console.log('📧 Email Demo - Would send to:', phone);
+            console.log(`Details: Booking #${booking.id} confirmed for ${date} at ${timeSlot}`);
+        }
 
         // Save booking
         bookings.push(booking);
